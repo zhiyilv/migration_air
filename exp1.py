@@ -1,38 +1,42 @@
+# from csv files, extract those geo-tagged lines
 import os
 import csv
 import pandas as pd
+import pickle
 
 
 data_folder = "D:\weibo"
 
-file_list = [i for i in os.listdir(data_folder) if i.endswith('.csv')]
+file_list = [i for i in os.listdir(data_folder) if i.endswith('.csv') and i.startswith('week')]
 
-
-f1 = os.path.join(data_folder, file_list[0])
-# chunksize = 100
-# tag = 0
-# for c in pd.read_csv(f1, chunksize=chunksize):
-#     if tag > 0:
-#         pass
-#     else:
-#         print(c)
-
+# f1 = os.path.join(data_folder, file_list[0])
+# store = []
 # with open(f1, encoding='utf-8', errors='replace') as f:
 #     myreader = csv.reader(f)
-#     flag = 0
 #     line_count = 0
+#     extract_count = 0
 #     for line in myreader:
 #         line_count += 1
-#         if flag > 100:
-#             break
-#         elif line[7] != '':
-#             # print(line[-5])
-#             print('line: {}, info: {}'.format(line_count, line[7:]))
-#             flag += 1
+#         if line[7]:
+#             extract_count += 1
+#             store.append(line)
+#             print('line: {}, no.: {}, info: {}'.format(line_count, extract_count, line[7:]))
 
-store = []
-with open(f1, encoding='utf-8') as f:
-    myreader = csv.reader(f)
+for file_name in file_list:
+    store = []
     line_count = 0
+    with open(os.path.join(data_folder, file_name), encoding='utf-8', errors='replace') as ref:
+        myreader = csv.reader(ref)
+        print('dealing with file {}'.format(file_name))
+        for line in myreader:
+            line_count += 1
+            if line[7]:
+                store.append(line)
+    print('extracted {} geo-tagged weibo from {} in total'.format(len(store), line_count))
+
+    # store
+    with open(os.path.join(data_folder, '{}_extracted'.format(file_name)), 'wb') as p_file:
+        pickle.dump(store, p_file)
+    print('stored in {}_extracted\n'.format(file_name))
 
 
